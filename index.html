@@ -76,7 +76,7 @@ nav button.on{background:linear-gradient(90deg,var(--p),#ff7eb3);border-color:tr
 .tab{position:absolute;inset:0;padding-top:74px;display:none;z-index:2}
 .tab.on{display:block;animation:in .6s}
 @keyframes in{from{opacity:0;scale:.97}}
-.reel{height:100%;overflow-y:auto;padding:10px 0 90px;scrollbar-width:none}
+.reel{height:100%;overflow-y:auto;padding:10px 0 90px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
 .reel::-webkit-scrollbar{display:none}
 .item{position:relative;width:min(560px,86vw);margin:0 auto 44px;border-radius:22px;padding:6px;background:linear-gradient(135deg,var(--p),#3a0f24,var(--p2));box-shadow:0 0 35px rgba(255,77,141,.45);transition:.4s;animation:bob 6s ease-in-out infinite}
 .item:nth-child(even){animation-delay:-3s}
@@ -85,11 +85,14 @@ nav button.on{background:linear-gradient(90deg,var(--p),#ff7eb3);border-color:tr
 .item img,.item video,.ph{display:block;width:100%;max-height:70vh;object-fit:cover;border-radius:17px;background:#120810}
 .ph{aspect-ratio:4/3;display:grid;place-items:center;text-align:center;color:var(--p2);padding:20px;font-size:.95rem;border:2px dashed #6b2442}
 .item small{display:block;text-align:center;padding:8px;color:#fff;opacity:.8}
-.note{height:100%;display:grid;place-items:center;padding:0 28px 28px}
-.frame{position:relative;width:min(640px,100%);max-height:100%;display:flex;border-radius:26px;isolation:isolate;background:#12060d;box-shadow:0 0 50px rgba(255,77,141,.4),inset 0 0 40px rgba(255,77,141,.12);animation:bob 6s infinite}
+
+/* surat: seluruh area .note yang digulir */
+.note{height:100%;display:flex;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:10px 24px 90px;scrollbar-width:none}
+.note::-webkit-scrollbar{display:none}
+.frame{position:relative;width:min(640px,100%);margin:auto;display:block;border-radius:26px;isolation:isolate;background:#12060d;box-shadow:0 0 50px rgba(255,77,141,.4),inset 0 0 40px rgba(255,77,141,.12);animation:bob 6s infinite}
 .frame::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:26px;padding:3px;background:conic-gradient(from var(--a,0deg),var(--p),#fff,var(--p2),#5a1d38,var(--p));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:spin 4s linear infinite}
-.frame-in{width:100%;overflow-y:auto;padding:46px 34px;text-align:center;border-radius:26px;scrollbar-width:none}
-.frame-in::-webkit-scrollbar{display:none}
+.frame-in{width:100%;padding:46px 34px;text-align:center;border-radius:26px}
+.frame-in p{margin-bottom:16px;line-height:1.7}
 
 /* bunga pink glow di pinggir bingkai */
 .dflower{position:absolute;z-index:3;transform:translate(-50%,-50%);pointer-events:none;color:#ff9ec4;
@@ -126,7 +129,9 @@ nav button.on{background:linear-gradient(90deg,var(--p),#ff7eb3);border-color:tr
 nav{justify-content:flex-start;padding:12px 60px 12px 10px;gap:6px}
 nav button{padding:9px 13px;font-size:.85rem}
 .tab{padding-top:68px}
-.frame{padding:36px 20px}.frame h2{font-size:2rem}
+.note{padding:6px 16px 90px}
+.frame-in{padding:38px 20px}
+.frame-in h2{font-size:2rem}
 .card{padding:40px 22px 30px}.card h1{font-size:2rem}
 #code{font-size:1.4rem;letter-spacing:.4em}
 .grid{grid-template-columns:repeat(2,1fr);gap:10px}
@@ -310,19 +315,30 @@ function startReel(){
     el.onerror=()=>el.replaceWith(ph(m.src));
     f.appendChild(el);reel.appendChild(f);
   });
-  let pos=0,hold=0,paused=false;
-  ["pointerenter","touchstart","wheel"].forEach(e=>reel.addEventListener(e,()=>{paused=true},{passive:true}));
-  ["pointerleave","touchend"].forEach(e=>reel.addEventListener(e,()=>{setTimeout(()=>{pos=reel.scrollTop;paused=false},1500)}));
-  (function loop(){
-    if($("#t1").classList.contains("on")&&!paused&&$("#main").classList.contains("on")){
-      if(hold>0)hold--;
-      else{
-        pos+=.55;reel.scrollTop=pos;
-        if(reel.scrollTop+reel.clientHeight>=reel.scrollHeight-2){hold=180;pos=0;setTimeout(()=>{reel.scrollTo({top:0,behavior:"smooth"})},1500)}
+  const SPEED=35;           // kecepatan gulir otomatis (px per detik), ubah sesuai selera
+  const IDLE=3000;          // lanjut otomatis setelah sekian ms tanpa disentuh
+  let pos=0,last=0,paused=false,idleT,endUntil=0;
+  const stop=()=>{
+    paused=true;clearTimeout(idleT);
+    idleT=setTimeout(()=>{pos=reel.scrollTop;paused=false},IDLE);
+  };
+  ["touchstart","touchmove","wheel","pointerdown","keydown"].forEach(e=>reel.addEventListener(e,stop,{passive:true}));
+  requestAnimationFrame(function loop(t){
+    const dt=Math.min(50,t-last)/1000;last=t;
+    const active=$("#t1").classList.contains("on")&&$("#main").classList.contains("on");
+    if(active&&!paused){
+      if(endUntil){
+        if(t>=endUntil){endUntil=0;pos=reel.scrollTop}
+      }else{
+        pos+=SPEED*dt;reel.scrollTop=pos;
+        if(reel.scrollTop+reel.clientHeight>=reel.scrollHeight-2){
+          endUntil=t+3000;
+          setTimeout(()=>reel.scrollTo({top:0,behavior:"smooth"}),1200);
+        }
       }
-    }
+    }else if(!active){pos=reel.scrollTop}
     requestAnimationFrame(loop);
-  })();
+  });
 }
 
 /* Navbar */
