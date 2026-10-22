@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gavrilla & Rafael</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--p:#ff4d8d;--p2:#ff9ec4;--bg:#07050a}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:#fff;font-family:'Quicksand',system-ui,sans-serif;overflow:hidden}
+.script{font-family:'Dancing Script',cursive}
+.screen{position:fixed;inset:0;display:none;overflow:hidden}
+.screen.on{display:block}
+
+/* ---------- LOVE DARI CSS (bukan icon) ---------- */
+.h{position:absolute;width:var(--s);height:var(--s);background:var(--c);transform:rotate(-45deg);pointer-events:none;filter:drop-shadow(0 0 6px var(--c))}
+.h::before,.h::after{content:"";position:absolute;width:100%;height:100%;background:var(--c);border-radius:50%}
+.h::before{top:-50%;left:0}.h::after{left:50%;top:0}
+.h.f{animation:fl var(--d) ease-in-out infinite;animation-delay:var(--dl)}
+@keyframes fl{0%,100%{opacity:0;scale:.4;translate:0 0}50%{opacity:.85;scale:1;translate:var(--x) -30px}}
+.h.fall{top:-8vh;animation:fall var(--d) linear forwards}
+@keyframes fall{0%{translate:0 0;opacity:0}10%{opacity:.9}100%{translate:var(--x) 115vh;opacity:0}}
+.h.bur{left:50%;top:50%;animation:bur var(--d) cubic-bezier(.1,.7,.3,1) forwards}
+@keyframes bur{0%{translate:0 0;scale:0;opacity:1}70%{opacity:1}100%{translate:var(--x) var(--y);scale:1;opacity:0}}
+.fx{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+
+/* ---------- 1. KODE ---------- */
+#lock{display:none;place-items:center;background:radial-gradient(circle at 50% 50%,#1b0a14,#07050a 70%)}
+#lock.on{display:grid}
+.card{position:relative;z-index:2;width:min(380px,88vw);padding:44px 30px 34px;text-align:center;border-radius:28px;background:rgba(20,8,16,.78);backdrop-filter:blur(8px);isolation:isolate;transition:transform .4s,box-shadow .4s;box-shadow:0 0 40px rgba(255,77,141,.25)}
+.card:hover{transform:translateY(-4px);box-shadow:0 0 70px rgba(255,77,141,.45)}
+.card::before{content:"";position:absolute;inset:-2px;z-index:-2;border-radius:30px;background:conic-gradient(from var(--a,0deg),var(--p),#fff,var(--p2),var(--p));animation:spin 5s linear infinite}
+.card::after{content:"";position:absolute;inset:0;z-index:-1;border-radius:28px;background:#14080f}
+@property --a{syntax:'<angle>';initial-value:0deg;inherits:false}
+@keyframes spin{to{--a:360deg}}
+.fl{position:absolute;font-size:30px;color:var(--p2);animation:sway 3.5s ease-in-out infinite;transition:.4s;text-shadow:0 0 10px var(--p)}
+.card:hover .fl{color:#fff;scale:1.3}
+.fl.a{top:-14px;left:-10px}.fl.b{top:-14px;right:-10px;animation-delay:.6s}.fl.c{bottom:-14px;left:-10px;animation-delay:1.2s}.fl.d{bottom:-14px;right:-10px;animation-delay:1.8s}
+@keyframes sway{0%,100%{rotate:-14deg}50%{rotate:14deg}}
+.card h1{font-size:2.3rem;color:var(--p2);text-shadow:0 0 18px var(--p)}
+.card p{margin:6px 0 22px;opacity:.75;font-size:.95rem}
+.beat{display:inline-block;animation:beat 1.2s infinite;color:var(--p)}
+@keyframes beat{0%,100%{scale:1}30%{scale:1.35}60%{scale:1.1}}
+#code{width:100%;padding:14px;text-align:center;font-size:1.6rem;letter-spacing:.5em;padding-left:.9em;color:#fff;background:#0b0408;border:2px solid #5a1d38;border-radius:16px;outline:0;transition:.3s}
+#code:hover,#code:focus{border-color:var(--p);box-shadow:0 0 22px rgba(255,77,141,.6)}
+.btn{margin-top:16px;width:100%;padding:13px;border:0;border-radius:16px;font:600 1rem 'Quicksand';color:#fff;cursor:pointer;background:linear-gradient(90deg,var(--p),#ff7eb3);transition:.3s;position:relative;overflow:hidden}
+.btn:hover{transform:scale(1.04);box-shadow:0 0 28px var(--p)}
+.btn:active{transform:scale(.97)}
+.btn::after{content:"";position:absolute;top:0;left:-80%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);transform:skewX(-20deg)}
+.btn:hover::after{left:140%;transition:.7s}
+#err{height:20px;margin-top:12px;font-size:.9rem;color:#ff7aa5}
+.shake{animation:shake .5s}
+@keyframes shake{20%,60%{translate:-10px 0}40%,80%{translate:10px 0}}
+
+/* ---------- 2. BOOM ---------- */
+#boom{background:radial-gradient(circle,#1c0a15,#000 75%);text-align:center}
+.bw{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.bw h2{font-size:clamp(2.4rem,9vw,5.5rem);color:var(--p2);text-shadow:0 0 25px var(--p),0 0 60px var(--p);animation:pop 1.2s cubic-bezier(.2,1.6,.4,1) both}
+.bw h3{margin-top:10px;font-size:clamp(1.2rem,4.5vw,2rem);font-weight:500;animation:pop 1.2s .5s cubic-bezier(.2,1.6,.4,1) both}
+.bw .btn{width:auto;padding:13px 34px;margin-top:34px;animation:pop 1s 1.6s both}
+@keyframes pop{0%{scale:0;opacity:0}100%{scale:1;opacity:1}}
+.bl{position:absolute;color:var(--p2);animation:rise var(--d) ease-in infinite;animation-delay:var(--dl);bottom:-40px;left:var(--l);font-size:var(--s)}
+@keyframes rise{0%{translate:0 0;rotate:0deg;opacity:0}15%{opacity:.9}100%{translate:var(--x) -110vh;rotate:360deg;opacity:0}}
+
+/* ---------- 3. GALERI ---------- */
+#main{background:var(--bg)}
+#main::before{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;box-shadow:inset 0 0 70px 6px rgba(255,77,141,.55);animation:glow 4s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:inset 0 0 110px 14px rgba(255,77,141,.8)}}
+nav{position:absolute;z-index:5;top:0;left:0;right:0;display:flex;justify-content:center;gap:8px;padding:14px 10px;background:linear-gradient(#07050a,transparent)}
+nav button{padding:10px 18px;border:1.5px solid #6b2442;border-radius:30px;background:rgba(20,8,16,.8);color:#fff;font:600 .95rem 'Quicksand';cursor:pointer;transition:.3s}
+nav button:hover{border-color:var(--p);box-shadow:0 0 18px var(--p);transform:translateY(-3px)}
+nav button.on{background:linear-gradient(90deg,var(--p),#ff7eb3);border-color:transparent}
+.tab{position:absolute;inset:0;padding-top:74px;display:none;z-index:2}
+.tab.on{display:block;animation:in .6s}
+@keyframes in{from{opacity:0;scale:.97}}
+.reel{height:100%;overflow-y:auto;padding:10px 0 90px;scrollbar-width:none}
+.reel::-webkit-scrollbar{display:none}
+.item{position:relative;width:min(560px,86vw);margin:0 auto 44px;border-radius:22px;padding:6px;background:linear-gradient(135deg,var(--p),#3a0f24,var(--p2));box-shadow:0 0 35px rgba(255,77,141,.45);transition:.4s;animation:bob 6s ease-in-out infinite}
+.item:nth-child(even){animation-delay:-3s}
+.item:hover{transform:scale(1.03) rotate(-.6deg);box-shadow:0 0 60px rgba(255,77,141,.8)}
+@keyframes bob{50%{translate:0 -8px}}
+.item img,.item video,.ph{display:block;width:100%;max-height:70vh;object-fit:cover;border-radius:17px;background:#120810}
+.ph{aspect-ratio:4/3;display:grid;place-items:center;text-align:center;color:var(--p2);padding:20px;font-size:.95rem;border:2px dashed #6b2442}
+.item small{display:block;text-align:center;padding:8px;color:#fff;opacity:.8}
+.note{height:100%;display:grid;place-items:center;padding:0 28px 28px}
+.frame{position:relative;width:min(640px,100%);max-height:100%;display:flex;border-radius:26px;isolation:isolate;background:#12060d;box-shadow:0 0 50px rgba(255,77,141,.4),inset 0 0 40px rgba(255,77,141,.12);animation:bob 6s infinite}
+.frame::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:26px;padding:3px;background:conic-gradient(from var(--a,0deg),var(--p),#fff,var(--p2),#5a1d38,var(--p));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:spin 4s linear infinite}
+.frame-in{width:100%;overflow-y:auto;padding:46px 34px;text-align:center;border-radius:26px;scrollbar-width:none}
+.frame-in::-webkit-scrollbar{display:none}
+
+/* bunga pink glow di pinggir bingkai */
+.dflower{position:absolute;z-index:3;transform:translate(-50%,-50%);pointer-events:none;color:#ff9ec4;
+  text-shadow:0 0 6px #ff4d8d,0 0 14px #ff4d8d,0 0 26px #ff4d8d;
+  animation:sway 3.5s ease-in-out infinite,glowf 2.4s ease-in-out infinite alternate}
+@keyframes glowf{to{color:#fff;text-shadow:0 0 10px #ff4d8d,0 0 22px #ff4d8d,0 0 40px #ff4d8d}}
+.frame>.h{z-index:3}
+
+.mem{height:100%;overflow-y:auto;padding:0 16px 90px;text-align:center}
+.mem h2{font-size:2.6rem;color:var(--p2);text-shadow:0 0 18px var(--p)}
+.mem .btn{width:auto;padding:12px 28px;margin:16px 0 26px}
+.empty{margin:30px auto;max-width:360px;padding:34px 20px;border:2px dashed #6b2442;border-radius:22px;opacity:.85}
+.empty b{display:block;font-size:2.4rem;animation:beat 1.4s infinite;color:var(--p)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px;max-width:900px;margin:0 auto}
+.grid .item{width:100%;margin:0;padding:4px;animation:none}
+.grid img,.grid video{aspect-ratio:1;max-height:none}
+/* ---------- MUSIK ---------- */
+#music{position:fixed;top:12px;right:10px;z-index:50;display:none}
+#music.on{display:block;animation:in .6s}
+#mbtn{width:42px;height:42px;border-radius:50%;border:1.5px solid var(--p);background:rgba(20,8,16,.88);color:var(--p2);font-size:1.2rem;cursor:pointer;box-shadow:0 0 16px rgba(255,77,141,.5);transition:.3s}
+#mbtn:hover{transform:scale(1.12);box-shadow:0 0 28px var(--p)}
+#mbtn.pl{animation:beat 1.4s infinite}
+#mpanel{position:absolute;top:52px;right:0;width:min(290px,86vw);padding:14px;border-radius:18px;background:rgba(18,6,13,.95);border:1.5px solid #6b2442;box-shadow:0 0 30px rgba(255,77,141,.4);display:none}
+#mpanel.on{display:block;animation:in .3s}
+.song{display:block;width:100%;padding:10px 12px;margin-bottom:6px;border:0;border-radius:12px;background:#1d0b14;color:#fff;font:500 .9rem 'Quicksand',sans-serif;text-align:left;cursor:pointer;transition:.25s}
+.song:hover{background:#3a1226;transform:translateX(4px)}
+.song.on{background:linear-gradient(90deg,var(--p),#ff7eb3)}
+.mrow{display:flex;gap:10px;align-items:center;margin-top:10px}
+.mrow .song{width:auto;margin:0;text-align:center}
+#mvol{flex:1;accent-color:var(--p)}
+#mmsg{font-size:.8rem;color:#ff9ec4;margin-top:8px;min-height:1em}
+/* ---------- HP ---------- */
+@media(max-width:600px){
+nav{justify-content:flex-start;padding:12px 60px 12px 10px;gap:6px}
+nav button{padding:9px 13px;font-size:.85rem}
+.tab{padding-top:68px}
+.frame{padding:36px 20px}.frame h2{font-size:2rem}
+.card{padding:40px 22px 30px}.card h1{font-size:2rem}
+#code{font-size:1.4rem;letter-spacing:.4em}
+.grid{grid-template-columns:repeat(2,1fr);gap:10px}
+.item{margin-bottom:34px}
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+</style>
+</head>
+<body>
+
+<!-- PEMUTAR MUSIK (muncul setelah kode benar) -->
+<div id="music">
+  <button id="mbtn" aria-label="Pilih lagu">♪</button>
+  <div id="mpanel">
+    <div id="slist"></div>
+    <div class="mrow">
+      <button class="song" id="mplay">⏸</button>
+      <input id="mvol" type="range" min="0" max="1" step=".01" value=".7" aria-label="Volume">
+    </div>
+    <div id="mmsg"></div>
+  </div>
+</div>
+
+<!-- 1. LAYAR KODE -->
+<section id="lock" class="screen on">
+  <div class="fx" id="lockfx"></div>
+  <div class="card" id="card">
+    <span class="fl a">❀</span><span class="fl b">✿</span><span class="fl c">✿</span><span class="fl d">❀</span>
+    <h1 class="script">Dear....? <span class="beat">♥</span></h1>
+    <p>Masukkan kode</p>
+    <input id="code" type="password" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="off">
+    <button class="btn" id="go">Buka</button>
+    <div id="err"></div>
+  </div>
+</section>
+
+<!-- 2. LAYAR BOOM -->
+<section id="boom" class="screen">
+  <div class="fx" id="boomfx"></div>
+  <div class="bw">
+    <h2 class="script">Happy Anniversary</h2>
+    <h3>1 Tahun Gavrilla And Rafael</h3>
+    <button class="btn" id="enter">GALERI FAEL AND AII</button>
+  </div>
+</section>
+
+<!-- 3. GALERI -->
+<section id="main" class="screen">
+  <div class="fx" id="rain"></div>
+  <nav>
+    <button class="on" data-t="t1">Highlight</button>
+    <button data-t="t2">?</button>
+    <button data-t="t3">Album</button>
+  </nav>
+
+  <div class="tab on" id="t1"><div class="reel" id="reel"></div></div>
+
+  <div class="tab" id="t2">
+    <div class="note"><div class="frame">
+      <div class="frame-in">
+      <h2 class="script">Dear Aii</h2>
+      <!-- ====== TULIS UCAPANMU DI SINI (ganti isi tag <p> di bawah) ====== -->
+      <p>Happy Anniversary 1 Tahun Sayang, Nda terasa torang 2 so 1 Tahun bersama,
+        banyak sekali lika liku yang torang 2 hadapi, mar nda bisa menyangka torang 2 so sejauh ini,
+        Terimakasih Sayang selalu memilih bersama, selalu saling menerima, selalu berusaha, selalu
+        berkorban, cuma for pertahankan hubungan ini fael merasa bersyukur sekali masih bisa bersama
+        dengan aii sampai saat ini, cantikku imutku cintaku, iloveyou forever sayang.
+      </p>
+      <p>fael juga mau bilang maaf selama 1 Tahun ini banyak kesalahan kesalahan yang fael buat
+        namun dari kesalahan itu fael belajar betapa bersyukurnya fael bisa memiliki aii, fael
+        harap hubungan ini akan tetap terus bertahan sampai maut yang memisahkan, fael cintaaa sekali
+        sama aii, semoga hubungan ini kedepannya akan terus berkembang, terus bertahan, saling menguatkan
+        dan tidak memilih melepaskan sebagai jalan keluarnya, kuat terus ya aii and fael untuk terus
+        bersama sama.
+      </p>
+      <p>Terimakasih sayangku cintaku cantikku aii sayan fael sayang sekali sama aii
+      , fael akan melindungi aii terus sayang semangat sayanggku i'm really love you with my
+      heart no one can stop me to loving you, iloveyou forever than anything sayangg semangat,
+       kuat terus menghadapi segala tantangan untuk aii sukses meraih cita cita, tetap kuat,
+        jangan mudah menyerah, tetap menjadi anak baik, dengar dengaran dan bisa lebih dewasa
+        kedepannya, semangat sayang iloveyou forever aii sayang mwah.
+      </p>
+      <p class="script" style="font-size:1.6rem;color:#ff9ec4">- Rafael</p>
+      <!-- ================================================================ -->
+       </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="tab" id="t3">
+    <div class="mem">
+      <h2 class="script">Kenang-Kenangan</h2>
+      <button class="btn" id="add">+ Tambah Foto / Video</button>
+      <input type="file" id="file" accept="image/*,video/*" multiple hidden>
+      <div class="empty" id="empty"><b>♥</b>Torang 2 isi sama sama</div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ============ PENGATURAN (EDIT DI SINI) ============ */
+const KODE = "231025";
+// Highlight: 5 foto + 5 video. Taruh file di folder "media" sebelah index.html
+const HIGHLIGHT = [
+  {t:"img",src:"media/foto1.jpg"},{t:"img",src:"media/foto6.jpg"},
+  {t:"img",src:"media/foto2.jpg"},{t:"img",src:"media/foto7.jpg"},
+  {t:"img",src:"media/foto3.jpg"},{t:"img",src:"media/foto8.jpg"},
+  {t:"img",src:"media/foto4.jpg"},{t:"img",src:"media/foto9.jpg"},
+  {t:"img",src:"media/foto5.jpg"},{t:"img",src:"media/foto10.jpg"}
+];
+// Daftar lagu: taruh file mp3 di folder "media", lalu tambah/ubah baris di bawah
+const SONGS = [
+  {title:"A Thousand Years - Christina Perri", src:"Christina Perri - A Thousand Years [Official Music Video].mp3"},
+  {title:"Elvis Presley - Can't Help Falling in Love", src:"Elvis Presley - Can't Help Falling in Love (Lyrics).mp3"},
+  {title:"Idgitaf - Terpikat Senyummu", src:"Idgitaf - Terpikat Senyummu (Official Music Video).mp3"}
+];
+const VOLUME_AKHIR = 0.7;   // volume normal (0 - 1)
+const DURASI_NAIK  = 10000; // lama suara naik pelan dari 0 ke normal (ms)
+/* ==================================================== */
+
+const $=s=>document.querySelector(s), R=(a,b)=>a+Math.random()*(b-a);
+const COL=["#ff4d8d","#ff7eb3","#ff9ec4","#ffc2d9","#ffffff"];
+
+function heart(box,cls,o={}){
+  const h=document.createElement("i");h.className="h "+cls;
+  const s=o.s??R(10,26);
+  h.style.cssText=`--s:${s}px;--c:${COL[Math.floor(R(0,4.99))]};--d:${o.d??R(4,9)}s;--dl:${o.dl??0}s;--x:${o.x??R(-40,40)}px;--y:${o.y??0}px;`+(o.l!=null?`left:${o.l}%;`:"")+(o.tp!=null?`top:${o.tp}%;`:"");
+  box.appendChild(h);
+  if(!cls.includes("f"))h.addEventListener("animationend",()=>h.remove());
+}
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));$(id).classList.add("on")}
+
+/* 1. Love berkedip di latar layar kode */
+for(let i=0;i<55;i++)heart($("#lockfx"),"f",{l:R(0,98),tp:R(0,95),d:R(3,7),dl:R(0,6),s:R(8,24)});
+
+function tryCode(){
+  const v=$("#code").value.trim();
+  if(v===KODE){ $("#err").textContent=""; celebrate(); startMusic(); }
+  else{
+    $("#err").textContent="Kode salah, coba ingat lagi ya 💔";
+    const c=$("#card");c.classList.remove("shake");void c.offsetWidth;c.classList.add("shake");
+    $("#code").value="";
+  }
+}
+$("#go").onclick=tryCode;
+$("#code").addEventListener("keydown",e=>{if(e.key==="Enter")tryCode()});
+
+/* 2. Boom */
+function celebrate(){
+  show("#boom");
+  const fx=$("#boomfx");
+  const wave=n=>{for(let i=0;i<n;i++){const a=R(0,6.283),r=R(120,Math.max(innerWidth,innerHeight)*.6);
+    heart(fx,"bur",{x:Math.cos(a)*r,y:Math.sin(a)*r,d:R(1.6,3),s:R(10,28)})}};
+  wave(70);setTimeout(()=>wave(50),700);setTimeout(()=>wave(40),1500);
+  // bunga naik perlahan
+  const F=["❀","✿","❁","✾"];
+  for(let i=0;i<28;i++){const b=document.createElement("span");b.className="bl";b.textContent=F[i%4];
+    b.style.cssText=`--l:${R(0,96)}%;--d:${R(6,11)}s;--dl:${R(0,6)}s;--s:${R(18,38)}px;--x:${R(-60,60)}px;`;fx.appendChild(b)}
+  setInterval(()=>{if($("#boom").classList.contains("on"))heart(fx,"bur",{x:R(-400,400),y:R(-300,300),d:R(2,3.5)})},900);
+}
+$("#enter").onclick=()=>{show("#main");startRain();startReel()};
+
+/* 3. Hujan love */
+let rainT;
+function startRain(){
+  clearInterval(rainT);
+  rainT=setInterval(()=>{if(document.hidden)return;
+    heart($("#rain"),"fall",{l:R(0,98),d:R(6,12),x:R(-80,80),s:R(8,22)})},320);
+}
+
+/* Highlight */
+function ph(txt){const d=document.createElement("div");d.className="ph";d.innerHTML="Taruh file di<br><b>"+txt+"</b>";return d}
+function startReel(){
+  const reel=$("#reel");if(reel.children.length)return;
+  HIGHLIGHT.forEach((m,i)=>{
+    const f=document.createElement("div");f.className="item";
+    let el;
+    if(m.t==="img"){el=new Image();el.src=m.src;el.alt="Foto "+(i+1)}
+    else{el=document.createElement("video");el.src=m.src;el.controls=true;el.muted=true;el.playsInline=true;el.preload="metadata"}
+    el.onerror=()=>el.replaceWith(ph(m.src));
+    f.appendChild(el);reel.appendChild(f);
+  });
+  let pos=0,hold=0,paused=false;
+  ["pointerenter","touchstart","wheel"].forEach(e=>reel.addEventListener(e,()=>{paused=true},{passive:true}));
+  ["pointerleave","touchend"].forEach(e=>reel.addEventListener(e,()=>{setTimeout(()=>{pos=reel.scrollTop;paused=false},1500)}));
+  (function loop(){
+    if($("#t1").classList.contains("on")&&!paused&&$("#main").classList.contains("on")){
+      if(hold>0)hold--;
+      else{
+        pos+=.55;reel.scrollTop=pos;
+        if(reel.scrollTop+reel.clientHeight>=reel.scrollHeight-2){hold=180;pos=0;setTimeout(()=>{reel.scrollTo({top:0,behavior:"smooth"})},1500)}
+      }
+    }
+    requestAnimationFrame(loop);
+  })();
+}
+
+/* Navbar */
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("nav button,.tab").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");$("#"+b.dataset.t).classList.add("on");
+});
+
+/* Album: tambah foto/video (tersimpan sementara selama halaman terbuka) */
+$("#add").onclick=()=>$("#file").click();
+$("#file").onchange=e=>{
+  [...e.target.files].forEach(f=>{
+    const u=URL.createObjectURL(f),w=document.createElement("div");w.className="item";
+    const el=f.type.startsWith("video")?Object.assign(document.createElement("video"),{src:u,controls:true,playsInline:true}):Object.assign(new Image(),{src:u});
+    w.appendChild(el);$("#grid").prepend(w);
+  });
+  $("#empty").style.display="none";e.target.value="";
+};
+/* ============ MUSIK ============ */
+const au=new Audio();au.preload="auto";
+let cur=0,maxV=VOLUME_AKHIR,fadeT;
+$("#mvol").value=maxV;
+
+function fade(to,ms){
+  clearInterval(fadeT);
+  const from=au.volume,n=ms/40;let i=0;
+  fadeT=setInterval(()=>{
+    i++;const t=Math.min(1,i/n),e=t*t*(3-2*t); // halus di awal & akhir
+    au.volume=Math.min(1,Math.max(0,from+(to-from)*e));
+    if(t>=1)clearInterval(fadeT);
+  },40);
+}
+function renderSongs(){
+  const box=$("#slist");box.innerHTML="";
+  SONGS.forEach((s,i)=>{
+    const b=document.createElement("button");
+    b.className="song"+(i===cur?" on":"");b.textContent="♪ "+s.title;
+    b.onclick=()=>playSong(i,3000);box.appendChild(b);
+  });
+}
+function playSong(i,ms){
+  cur=i;clearInterval(fadeT);
+  $("#mmsg").textContent="";
+  au.src=SONGS[i].src;au.volume=0;
+  au.play().then(()=>fade(maxV,ms)).catch(()=>{});
+  renderSongs();
+}
+function startMusic(){
+  $("#music").classList.add("on");
+  playSong(0,DURASI_NAIK);   // dipanggil dari klik tombol, jadi browser mengizinkan autoplay
+}
+au.onended=()=>playSong((cur+1)%SONGS.length,3000);
+au.onerror=()=>{$("#mmsg").textContent="File lagu belum ada di folder media."};
+au.onplay=()=>{$("#mbtn").classList.add("pl");$("#mplay").textContent="⏸"};
+au.onpause=()=>{$("#mbtn").classList.remove("pl");$("#mplay").textContent="▶"};
+$("#mplay").onclick=()=>{
+  if(au.paused){au.volume=0;au.play().then(()=>fade(maxV,2000)).catch(()=>{})}
+  else au.pause();
+};
+$("#mvol").oninput=e=>{maxV=+e.target.value;clearInterval(fadeT);au.volume=maxV};
+$("#mbtn").onclick=e=>{e.stopPropagation();$("#mpanel").classList.toggle("on")};
+$("#mpanel").onclick=e=>e.stopPropagation();
+document.addEventListener("click",()=>$("#mpanel").classList.remove("on"));
+renderSongs();
+
+/* ============ HIASAN BINGKAI SURAT ============ */
+(function decorFrame(){
+  const fr=document.querySelector(".frame"), F=["❀","✿","❁","✾"];
+  const pts=[], hearts=[];
+  for(let i=0;i<=6;i++){
+    pts.push([i*100/6,0],[i*100/6,100]);
+    if(i<6)hearts.push([i*100/6+8.3,0],[i*100/6+8.3,100]);
+  }
+  for(let i=1;i<=7;i++){
+    pts.push([0,i*100/8],[100,i*100/8]);
+    hearts.push([0,i*100/8+6],[100,i*100/8+6]);
+  }
+  pts.forEach(([l,t],i)=>{
+    const s=document.createElement("span");
+    s.className="dflower";s.textContent=F[i%4];
+    s.style.cssText=`left:${l}%;top:${t}%;font-size:${R(20,30)}px;animation-delay:${R(0,3)}s`;
+    fr.appendChild(s);
+  });
+  hearts.forEach(([l,t])=>{
+    if(t>=100&&l>100)return;
+    heart(fr,"f",{l:Math.min(l,98),tp:t,s:R(8,13),d:R(2.5,4.5),dl:R(0,3),x:R(-6,6)});
+  });
+})();
+</script>
+<script src="minigame.js"></script>
+</body>
+</html>
